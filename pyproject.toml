@@ -30,12 +30,14 @@ Issues = "https://github.com/a-kazakov/lambda-lift/issues"
 lambda-lift = "lambda_lift.cli_main:cli_main"
 
 [tool.hatch.build.targets.sdist]
+packages = ["src/lambda_lift"]
 include = [
     "src/**/*.py",
     "src/**/py.typed",
 ]
 
 [tool.hatch.build.targets.wheel]
+packages = ["src/lambda_lift"]
 include = [
     "src/**/*.py",
     "src/**/py.typed",
