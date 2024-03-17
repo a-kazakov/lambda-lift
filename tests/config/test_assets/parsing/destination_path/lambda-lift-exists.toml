@@ -1,0 +1,2 @@
+[build]
+destination_path = "test-dist/marker.txt"

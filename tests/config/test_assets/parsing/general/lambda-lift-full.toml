@@ -1,0 +1,21 @@
+[general]
+name = "sample-name"
+
+[build]
+source_paths = ["sample_src"]
+requirements_path = "requirements.txt"
+destination_path = "{git_root}/temp/{name}.zip"
+cache_path = "{git_root}/temp/cache/{name}"
+platform = "arm64"
+python_executable = "python3.14"
+ignore_libraries = ["numpy"]
+
+[deployment.dev]
+region = "us-west-2"
+name = "dev-lambda-name"
+aws_profile = "dev-push"
+
+[deployment.prod]
+region = "us-west-2"
+name = "prod-lambda-name"
+aws_profile = "prod-push"

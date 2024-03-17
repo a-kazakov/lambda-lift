@@ -1,0 +1,5 @@
+[general]
+name = "sample_src"
+
+[build]
+source_paths = ["{name}_a", "sample_src_b", "{git_root}/tests/config/test_assets/parsing/source_paths/sample_src_c"]

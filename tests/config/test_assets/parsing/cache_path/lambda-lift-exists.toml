@@ -1,0 +1,2 @@
+[build]
+cache_path = "test-cache"

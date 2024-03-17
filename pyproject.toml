@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lambda-lift"
+version = "0.0.1"
+authors = [
+    { name = "Artem Kazakov", email = "opensource@akazakov.net" },
+]
+description = "An AWS Lambda packager"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "boto3",
+    "rich",
+    "click",
+]
+
+[project.urls]
+Homepage = "https://github.com/a-kazakov/lambda-lift"
+Issues = "https://github.com/a-kazakov/lambda-lift/issues"
+
+[project.scripts]
+lambda-lift = "lambda_lift.cli_main:cli_main"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/**/*.py",
+]

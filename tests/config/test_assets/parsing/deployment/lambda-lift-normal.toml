@@ -1,0 +1,8 @@
+[deployment.profile1]
+region = "us-west-1"
+name = "lambda1"
+
+[deployment.profile2]
+region = "us-west-2"
+name = "lambda2"
+aws_profile = "aws_p2"

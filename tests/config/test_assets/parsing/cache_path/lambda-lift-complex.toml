@@ -1,0 +1,5 @@
+[general]
+name = "test-cache"
+
+[build]
+cache_path = "{git_root}/tests/config/test_assets/parsing/cache_path/{name}"

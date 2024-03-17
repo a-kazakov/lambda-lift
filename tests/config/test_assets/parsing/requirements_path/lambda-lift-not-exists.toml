@@ -1,0 +1,2 @@
+[build]
+requirements_path = "requirements-not-exists.txt"

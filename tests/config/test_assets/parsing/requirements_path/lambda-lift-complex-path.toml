@@ -1,0 +1,2 @@
+[build]
+requirements_path = "{git_root}/tests/config/test_assets/parsing/requirements_path/requirements-{name}.txt"

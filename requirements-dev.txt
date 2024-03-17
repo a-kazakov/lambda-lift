@@ -1,0 +1,3 @@
+black
+mypy
+types-boto3

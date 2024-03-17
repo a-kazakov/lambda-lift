@@ -1,0 +1,2 @@
+[build]
+destination_path = "non-existing-test-dist/lambda.zip"
