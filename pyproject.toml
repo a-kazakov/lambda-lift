@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lambda-lift"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     { name = "Artem Kazakov", email = "opensource@akazakov.net" },
 ]
@@ -37,8 +37,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lambda_lift"]
 include = [
-    "src/**/*.py",
-    "src/**/py.typed",
+    "*.py",
+    "**/py.typed",
 ]
