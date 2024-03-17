@@ -32,4 +32,11 @@ lambda-lift = "lambda_lift.cli_main:cli_main"
 [tool.hatch.build.targets.sdist]
 include = [
     "src/**/*.py",
+    "src/**/py.typed",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "src/**/*.py",
+    "src/**/py.typed",
 ]
