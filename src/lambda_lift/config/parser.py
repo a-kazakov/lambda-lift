@@ -46,7 +46,12 @@ class FormattingMapping(Mapping[str, str]):
                     self.parser.toml_path,
                     f"Can't use git_root placeholder in {self.field} field",
                 )
-            return find_git_root(self.parser.toml_path).absolute()
+            git_root = find_git_root(self.parser.toml_path)
+            if git_root is None:
+                raise InvalidConfigException(
+                    self.parser.toml_path, "Can't find git root"
+                )
+            return str(git_root.absolute())
         raise InvalidConfigException(
             self.parser.toml_path,
             f"Unknown placeholder {name} in {self.field} field",
