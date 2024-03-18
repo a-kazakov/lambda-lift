@@ -29,14 +29,16 @@ def check_dependencies_up_to_date(config: SingleLambdaConfig) -> bool:
     if not hash_path.exists():
         return False
     hash_lines = hash_path.read_text().splitlines()
-    if len(hash_lines) != 2:
+    if len(hash_lines) != 3:
         return False
-    stored_requirements_hash, stored_zip_hash = hash_lines
+    stored_requirements_hash, stored_zip_hash, stored_config_hash = hash_lines
     actual_requirements_hash = _hash_file(config.build.requirements_path)
     actual_zip_hash = _hash_file(deps_path)
+    actual_config_hash = config.build.data_hash
     return (
         stored_requirements_hash == actual_requirements_hash
         and stored_zip_hash == actual_zip_hash
+        and stored_config_hash == actual_config_hash
     )
 
 
@@ -44,5 +46,6 @@ def bump_dependencies_cache(config: SingleLambdaConfig) -> None:
     deps_zip_path = get_dependencies_zip_path(config)
     requirements_hash = _hash_file(config.build.requirements_path)
     zip_hash = _hash_file(deps_zip_path)
+    config_hash = config.build.data_hash
     hash_path = config.build.cache_path / f"hashes_{config.name}.txt"
-    hash_path.write_text(f"{requirements_hash}\n{zip_hash}")
+    hash_path.write_text(f"{requirements_hash}\n{zip_hash}\n{config_hash}")

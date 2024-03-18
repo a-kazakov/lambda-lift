@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Sequence, Collection
 
 from lambda_lift.config.enums import Platform
 from lambda_lift.config.exceptions import InvalidConfigException
+from lambda_lift.utils.hashing import get_string_blake2b
 
 
 @dataclass(frozen=True)
@@ -17,6 +19,20 @@ class BuildConfig:
     platform: Platform
     python_executable: str | None
     ignore_libraries: Collection[str]
+
+    @property
+    def data_hash(self) -> str:
+        jsonable_object = {
+            "source_paths": [str(p) for p in self.source_paths],
+            "requirements_path": str(self.requirements_path),
+            "destination_path": str(self.destination_path),
+            "cache_path": str(self.cache_path),
+            "platform": self.platform.value,
+            "python_executable": self.python_executable,
+            "ignore_libraries": sorted(self.ignore_libraries),
+        }
+        json_value = json.dumps(jsonable_object, sort_keys=True)
+        return get_string_blake2b(json_value)
 
 
 @dataclass(frozen=True)

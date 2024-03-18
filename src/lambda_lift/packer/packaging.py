@@ -56,6 +56,9 @@ def build_dependencies_zip_file(
             prefix, _, _ = pkg.partition("==")
             if prefix not in config.build.ignore_libraries:
                 filtered_packages.append(pkg)
+        if not filtered_packages:  # No dependencies to install
+            make_empty_zip(get_dependencies_zip_path(config))
+            return
         # Step 3: Install only filtered packages
         step_3_path = temp_path / "step_3"
         step_3_path.mkdir()
