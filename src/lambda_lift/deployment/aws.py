@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-import hashlib
-import traceback
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import boto3
 import botocore.exceptions
@@ -50,7 +47,6 @@ def _deploy_lambda_via_s3(
             with zip_path.open("rb") as f:
                 s3_client.upload_fileobj(f, s3_bucket, s3_key)
     except botocore.exceptions.ClientError as ex:
-        get_console().print_exception()
         raise AwsError(f"Failed to upload code for {lambda_name} to S3: {ex}") from ex
     lambda_client = session.client("lambda")
     try:
