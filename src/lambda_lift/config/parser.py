@@ -152,6 +152,7 @@ class SingleLambdaConfigParser:
         return DeploymentConfig(
             region=self.get_deployment_region(profile),
             name=self.get_deployment_lambda_name(profile),
+            s3_path=self.get_s3_path(profile),
             aws_profile=self.get_deployment_aws_profile(profile),
         )
 
@@ -179,6 +180,23 @@ class SingleLambdaConfigParser:
                 self.toml_path, f"Missing lamdda name for deployment profile {profile}"
             )
         return result
+
+    def get_s3_path(self, profile: str) -> tuple[str, str] | None:
+        result = self.get_toml_string("deployment", profile, "s3_url")
+        if result is None:
+            return None
+        match = re.match(r"^s3://([^/]+)(?:/(.*)|$)", result)
+        if match is None:
+            raise InvalidConfigException(
+                self.toml_path,
+                f"Invalid s3_url for deployment profile {profile}. "
+                f"Expected format s3://bucket_name/path/to/deployment/directory/.",
+            )
+        bucket = match.group(1)
+        path = match.group(2) or ""
+        if path and not path.endswith("/"):
+            path += "/"
+        return bucket, path
 
     def get_deployment_aws_profile(self, profile: str) -> str | None:
         return self.get_toml_string("deployment", profile, "aws_profile")

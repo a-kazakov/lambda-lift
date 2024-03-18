@@ -166,17 +166,37 @@ class TestParsing:
 
     def test_deployment_list_profiles(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
-        assert sorted(parser.deployment_profiles) == ["profile1", "profile2"]
+        assert sorted(parser.deployment_profiles) == [
+            "profile1",
+            "profile2",
+            "profile3",
+            "profile4",
+            "profile5",
+        ]
 
     def test_deployment_extract_region(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
         assert parser.get_deployment_region("profile1") == "us-west-1"
         assert parser.get_deployment_region("profile2") == "us-west-2"
+        assert parser.get_deployment_region("profile3") == "us-east-1"
+        assert parser.get_deployment_region("profile4") == "us-east-2"
+        assert parser.get_deployment_region("profile5") == "us-central-1"
 
     def test_deployment_extract_lambda_name(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
         assert parser.get_deployment_lambda_name("profile1") == "lambda1"
         assert parser.get_deployment_lambda_name("profile2") == "lambda2"
+        assert parser.get_deployment_lambda_name("profile3") == "lambda3"
+        assert parser.get_deployment_lambda_name("profile4") == "lambda4"
+        assert parser.get_deployment_lambda_name("profile5") == "lambda5"
+
+    def test_deployment_extract_s3_path(self) -> None:
+        parser = self._make_parser("deployment/lambda-lift-normal")
+        assert parser.get_s3_path("profile1") == ("bucket1", "")
+        assert parser.get_s3_path("profile2") == ("bucket2", "path/to/temp/location/")
+        assert parser.get_s3_path("profile3") == ("bucket3", "")
+        assert parser.get_s3_path("profile4") == ("bucket4", "key4/")
+        assert parser.get_s3_path("profile5") is None
 
     def test_deployment_extract_aws_profile(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
@@ -213,11 +233,15 @@ class TestParsing:
             ),
             deployments={
                 "dev": DeploymentConfig(
-                    region="us-west-2", name="dev-lambda-name", aws_profile="dev-push"
+                    region="us-west-2",
+                    name="dev-lambda-name",
+                    s3_path=("dev-bucket", "dev-key/"),
+                    aws_profile="dev-push",
                 ),
                 "prod": DeploymentConfig(
                     region="us-west-2",
                     name="prod-lambda-name",
+                    s3_path=None,
                     aws_profile="prod-push",
                 ),
             },

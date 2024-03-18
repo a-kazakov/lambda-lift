@@ -13,6 +13,7 @@ ignore_libraries = ["numpy"]
 [deployment.dev]
 region = "us-west-2"
 name = "dev-lambda-name"
+s3_url = "s3://dev-bucket/dev-key/"
 aws_profile = "dev-push"
 
 [deployment.prod]

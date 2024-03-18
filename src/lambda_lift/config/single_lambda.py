@@ -23,6 +23,7 @@ class BuildConfig:
 class DeploymentConfig:
     region: str
     name: str
+    s3_path: tuple[str, str] | None
     aws_profile: str | None
 
 

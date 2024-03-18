@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-import base64
-import hashlib
 from pathlib import Path
 
 from lambda_lift.config.single_lambda import SingleLambdaConfig
+from lambda_lift.utils.hashing import get_file_blake2b
 
 
 def _hash_file(path: Path | None) -> str:
     if path is None:
         return ""
-    return base64.b64encode(hashlib.blake2b(path.read_bytes()).digest()).decode()
+    return get_file_blake2b(path)
 
 
 def get_dependencies_zip_path(config: SingleLambdaConfig) -> Path:
