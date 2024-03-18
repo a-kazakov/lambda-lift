@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from lambda_lift.exceptions import UserError
 
-class ConfigException(Exception): ...
+
+class ConfigException(UserError): ...
 
 
 class InvalidConfigException(ConfigException):

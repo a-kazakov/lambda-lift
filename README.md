@@ -33,7 +33,7 @@ lambda-lift --deploy-all prod  # Deploy all lambdas using the prod profile
 
 ## Configuration
 
-The configuration is done via TOML files. The files must be named either as `lambda-lift.toml`, or `lambda-lift-<name>.toml` (`<name>` could be anything). The configuration files can be placed anywhere in the repository - for example, all toml files in all location, or each toml file in the directory of the lambda it configures.
+The configuration is done via TOML files. The files must be named either as `lambda-lift.toml`, or `lambda-lift-<name>.toml` (`<name>` could be anything). The configuration files can be placed anywhere in the repository - for example, all toml files in one location, or each toml file in the directory of the lambda it configures.
 
 ### Toml example
 

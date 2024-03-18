@@ -5,7 +5,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from lambda_lift.utils.cli_tools import get_console
+from rich import markup
+
+from lambda_lift.exceptions import UserError
+from lambda_lift.utils.cli_tools import rich_print
 
 
 def run_pip_install(
@@ -15,7 +18,7 @@ def run_pip_install(
     platform: str | None = None,
     implementation: str | None = "cp",
     only_binary: str = ":all:",
-    upgrade: bool = True,
+    upgrade: bool = False,
     no_deps: bool = False,
     requirement: Path | None = None,
 ) -> None:
@@ -33,9 +36,17 @@ def run_pip_install(
     sp = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
     _, stderr = sp.communicate()
     if sp.returncode != 0:
-        cmd_str = " ".join(map(shlex.quote, cmd))
-        get_console().print(f"[red]pip install failed ({cmd_str}): {stderr.decode()}")
-        raise RuntimeError(f"pip install failed")
+        try:
+            target_idx = cmd.index("--target")
+            short_cmd = cmd[:target_idx] + cmd[target_idx + 2 :]
+        except ValueError:
+            short_cmd = cmd
+        cmd_str = " ".join(map(shlex.quote, short_cmd))
+        rich_print(
+            f"[red][bold]pip install failed\n> [/bold]{markup.escape(cmd_str)}\n"
+            f"[pink3]{markup.escape(stderr.decode())}"
+        )
+        raise UserError(f"pip install failed")
 
 
 def run_pip_freeze(
@@ -48,6 +59,9 @@ def run_pip_freeze(
     stdout, stderr = sp.communicate()
     if sp.returncode != 0:
         cmd_str = " ".join(map(shlex.quote, cmd))
-        get_console().print(f"[red]pip freeze failed ({cmd_str}): {stderr.decode()}")
-        raise RuntimeError(f"pip freeze failed")
+        rich_print(
+            f"[red][bold]pip freeze failed\n> [/bold]{markup.escape(cmd_str)}\n"
+            f"[pink3]{markup.escape(stderr.decode())}",
+        )
+        raise UserError(f"pip freeze failed")
     return stdout.decode().splitlines()

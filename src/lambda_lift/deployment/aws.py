@@ -3,7 +3,7 @@ from __future__ import annotations
 import boto3
 
 from lambda_lift.config.single_lambda import SingleLambdaConfig
-from lambda_lift.utils.cli_tools import get_console
+from lambda_lift.utils.cli_tools import get_console, rich_print
 
 
 def deploy_lambda(config: SingleLambdaConfig, profile: str) -> None:
@@ -12,7 +12,7 @@ def deploy_lambda(config: SingleLambdaConfig, profile: str) -> None:
         f"[purple]Deploying {config.name} ({profile}) to AWS -> {deploy_config.name}..."
     ):
         if deploy_config is None:
-            get_console().print(
+            rich_print(
                 f"[amber]Deployment profile {profile} is not set for lambda {config.name}, skipping"
             )
             return
@@ -24,4 +24,4 @@ def deploy_lambda(config: SingleLambdaConfig, profile: str) -> None:
             FunctionName=deploy_config.name,
             ZipFile=config.build.destination_path.read_bytes(),
         )
-    get_console().print(f"[purple]Deployed {config.name} ({profile}) to AWS")
+    rich_print(f"[purple]Deployed {config.name} ({profile}) to AWS")

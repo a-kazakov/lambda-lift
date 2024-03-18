@@ -13,7 +13,7 @@ from lambda_lift.packer.cache import (
 )
 from lambda_lift.packer.pip import run_pip_install, run_pip_freeze
 from lambda_lift.packer.zip import make_empty_zip, zip_folder, add_folders_to_zip
-from lambda_lift.utils.cli_tools import get_console
+from lambda_lift.utils.cli_tools import get_console, rich_print
 
 
 def _get_pip_platform(platform: Platform) -> str:
@@ -96,4 +96,4 @@ def package_lambda(config: SingleLambdaConfig) -> None:
             bump_dependencies_cache(config)
             status.update(base_status)
         add_source_code(config)
-    get_console().print(f"[blue]Packaging of {config.name} completed")
+    rich_print(f"[blue]Packaging of {config.name} completed")

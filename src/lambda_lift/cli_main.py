@@ -6,11 +6,11 @@ from pathlib import Path
 
 import click
 
-from lambda_lift.config.exceptions import ConfigException
 from lambda_lift.config.registry import ConfigsRegistry
 from lambda_lift.deployment.aws import deploy_lambda
+from lambda_lift.exceptions import UserError
 from lambda_lift.packer.packaging import package_lambda
-from lambda_lift.utils.cli_tools import get_console
+from lambda_lift.utils.cli_tools import get_console, rich_print
 
 
 @click.command()
@@ -41,7 +41,7 @@ def cli_main(lambdas: list[str], deploy: list[str], deploy_all: list[str]) -> No
         # Load configs
         with get_console().status("[blue]Reading configs..."):
             registry = ConfigsRegistry(Path.cwd())
-            get_console().print(
+            rich_print(
                 f"[yellow]Found {len(registry)} config{'s' if len(registry) != 1 else ''}"
             )
             for lambda_name in lambdas:
@@ -61,9 +61,9 @@ def cli_main(lambdas: list[str], deploy: list[str], deploy_all: list[str]) -> No
                 deploy_lambda(registry.get(lambda_name), profile)
         # Print stats
         elapsed_time = time.monotonic() - start_time
-        get_console().print(f"[green]Completed in {elapsed_time:.2f} seconds")
-    except ConfigException as ex:
-        get_console().print(f"[red]{str(ex)}")
+        rich_print(f"[green]Completed in {elapsed_time:.2f} seconds")
+    except UserError as ex:
+        rich_print(f"[red]{str(ex)}")
         sys.exit(2)
     except Exception:
         get_console().print_exception(show_locals=False)
