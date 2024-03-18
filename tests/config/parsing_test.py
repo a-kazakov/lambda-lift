@@ -89,6 +89,11 @@ class TestParsing:
         with pytest.raises(InvalidConfigException):
             parser.destination_path
 
+    def test_destination_path_missing(self) -> None:
+        parser = self._make_parser("destination_path/lambda-lift-broken-template")
+        with pytest.raises(InvalidConfigException):
+            parser.destination_path
+
     def test_destination_path_dir(self) -> None:
         parser = self._make_parser("destination_path/lambda-lift-dir")
         with pytest.raises(InvalidConfigException):
@@ -172,6 +177,7 @@ class TestParsing:
             "profile3",
             "profile4",
             "profile5",
+            "profile6",
         ]
 
     def test_deployment_extract_region(self) -> None:
@@ -181,14 +187,16 @@ class TestParsing:
         assert parser.get_deployment_region("profile3") == "us-east-1"
         assert parser.get_deployment_region("profile4") == "us-east-2"
         assert parser.get_deployment_region("profile5") == "us-central-1"
+        assert parser.get_deployment_region("profile6") == "us-central-2"
 
     def test_deployment_extract_lambda_name(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
         assert parser.get_deployment_lambda_name("profile1") == "lambda1"
-        assert parser.get_deployment_lambda_name("profile2") == "lambda2"
+        assert parser.get_deployment_lambda_name("profile2") == "lambda2-normal"
         assert parser.get_deployment_lambda_name("profile3") == "lambda3"
         assert parser.get_deployment_lambda_name("profile4") == "lambda4"
         assert parser.get_deployment_lambda_name("profile5") == "lambda5"
+        assert parser.get_deployment_lambda_name("profile6") == "lambda6"
 
     def test_deployment_extract_s3_path(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")
@@ -196,7 +204,8 @@ class TestParsing:
         assert parser.get_s3_path("profile2") == ("bucket2", "path/to/temp/location/")
         assert parser.get_s3_path("profile3") == ("bucket3", "")
         assert parser.get_s3_path("profile4") == ("bucket4", "key4/")
-        assert parser.get_s3_path("profile5") is None
+        assert parser.get_s3_path("profile5") == ("bucket5", "normal/")
+        assert parser.get_s3_path("profile6") is None
 
     def test_deployment_extract_aws_profile(self) -> None:
         parser = self._make_parser("deployment/lambda-lift-normal")

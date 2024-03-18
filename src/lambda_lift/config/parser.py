@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-import random
 import re
-import string
 import tomllib
 from functools import cached_property
 from pathlib import Path
-from typing import Sequence, Any
+from typing import Sequence, Any, Mapping, Iterator
 
 from lambda_lift.config.enums import Platform
 from lambda_lift.config.exceptions import InvalidConfigException
@@ -17,6 +15,48 @@ from lambda_lift.config.single_lambda import (
     DeploymentConfig,
 )
 from lambda_lift.utils.git import find_git_root
+
+
+class FormattingMapping(Mapping[str, str]):
+    def __init__(
+        self,
+        parser: SingleLambdaConfigParser,
+        field: str,
+        *,
+        allow_name: bool,
+        allow_git_root: bool,
+    ) -> None:
+        super().__init__()
+        self.parser = parser
+        self.field = field
+        self.allow_name = allow_name
+        self.allow_git_root = allow_git_root
+
+    def __getitem__(self, name: str) -> str:
+        if name == "name":
+            if not self.allow_name:
+                raise InvalidConfigException(
+                    self.parser.toml_path,
+                    f"Can't use name placeholder in {self.field} field",
+                )
+            return self.parser.name
+        if name == "git_root":
+            if not self.allow_git_root:
+                raise InvalidConfigException(
+                    self.parser.toml_path,
+                    f"Can't use git_root placeholder in {self.field} field",
+                )
+            return find_git_root(self.parser.toml_path).absolute()
+        raise InvalidConfigException(
+            self.parser.toml_path,
+            f"Unknown placeholder {name} in {self.field} field",
+        )
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(["name", "git_root"])
+
+    def __len__(self) -> int:
+        return 2
 
 
 class SingleLambdaConfigParser:
@@ -86,7 +126,7 @@ class SingleLambdaConfigParser:
         source_paths = self.get_toml_list_of_strings("build", "source_paths")
         if source_paths is None:
             raise InvalidConfigException(self.toml_path, "Missing source_paths")
-        result = [self.resolve_path(p) for p in source_paths]
+        result = [self.resolve_path(p, field="source_path") for p in source_paths]
         for path in result:
             if not path.exists():
                 raise InvalidConfigException(
@@ -177,14 +217,16 @@ class SingleLambdaConfigParser:
         result = self.get_toml_string("deployment", profile, "name")
         if result is None:
             raise InvalidConfigException(
-                self.toml_path, f"Missing lamdda name for deployment profile {profile}"
+                self.toml_path, f"Missing lambda name for deployment profile {profile}"
             )
+        result = self.augment_value(result, f"deployment.{profile}.name")
         return result
 
     def get_s3_path(self, profile: str) -> tuple[str, str] | None:
         result = self.get_toml_string("deployment", profile, "s3_url")
         if result is None:
             return None
+        result = self.augment_value(result, f"deployment.{profile}.s3_url")
         match = re.match(r"^s3://([^/]+)(?:/(.*)|$)", result)
         if match is None:
             raise InvalidConfigException(
@@ -203,17 +245,24 @@ class SingleLambdaConfigParser:
 
     # TOML extraction helpers
 
-    def resolve_path(self, value: str) -> Path:
-        git_root_ph = "".join(random.choices(string.ascii_lowercase, k=20))
-        value = value.format(name=self.name, git_root=git_root_ph)
-        if git_root_ph in value:  # Only find git root if there was a placeholder
-            git_root = find_git_root(self.toml_path)
-            if git_root is None:
-                raise InvalidConfigException(
-                    self.toml_path, "Failed to find git root for path resolution"
-                )
-            value = value.replace(git_root_ph, str(git_root.absolute()))
-        return self.toml_path.parent / value
+    def augment_value(
+        self,
+        value: str,
+        field: str,
+        *,
+        allow_name: bool = True,
+        allow_git_root: bool = False,
+    ) -> str:
+        return value.format_map(
+            FormattingMapping(
+                self, field, allow_name=allow_name, allow_git_root=allow_git_root
+            )
+        )
+
+    def resolve_path(self, value: str, *, field: str) -> Path:
+        return self.toml_path.parent / self.augment_value(
+            value, field, allow_git_root=True
+        )
 
     def get_toml_value(self, *path: str) -> Any | None:
         try:
@@ -243,7 +292,7 @@ class SingleLambdaConfigParser:
         value = self.get_toml_string(*path_parts)
         if value is None:
             return None
-        path = self.resolve_path(value)
+        path = self.resolve_path(value, field=".".join(path_parts))
         if must_exist and not path.exists():
             raise InvalidConfigException(self.toml_path, f"Path {path} does not exist")
         return path

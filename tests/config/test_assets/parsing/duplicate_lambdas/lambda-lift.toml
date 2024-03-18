@@ -12,10 +12,10 @@ ignore_libraries = ["numpy"]
 
 [deployment.dev]
 region = "us-west-2"
-name = "dumplicate-lambda-name"
+name = "duplicate-lambda-name"
 aws_profile = "dev-push"
 
 [deployment.prod]
 region = "us-west-2"
-name = "dumplicate-lambda-name"
+name = "duplicate-lambda-name"
 aws_profile = "prod-push"

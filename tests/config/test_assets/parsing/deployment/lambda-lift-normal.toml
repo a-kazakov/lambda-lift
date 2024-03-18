@@ -5,7 +5,7 @@ name = "lambda1"
 
 [deployment.profile2]
 region = "us-west-2"
-name = "lambda2"
+name = "lambda2-{name}"
 s3_url = "s3://bucket2/path/to/temp/location"
 aws_profile = "aws_p2"
 
@@ -21,4 +21,9 @@ name = "lambda4"
 
 [deployment.profile5]
 region = "us-central-1"
+s3_url = "s3://bucket5/{name}/"
 name = "lambda5"
+
+[deployment.profile6]
+region = "us-central-2"
+name = "lambda6"
