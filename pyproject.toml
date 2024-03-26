@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lambda-lift"
-version = "0.0.9"
+version = "0.0.10"
 authors = [
     { name = "Artem Kazakov", email = "opensource@akazakov.net" },
 ]
@@ -20,6 +20,7 @@ dependencies = [
     "boto3",
     "rich",
     "click",
+    "repro-zipfile",
 ]
 
 [project.urls]

@@ -6,20 +6,22 @@ import zipfile
 from pathlib import Path
 from typing import Callable, Iterable
 
+from repro_zipfile import ReproducibleZipFile
+
 
 def zip_folder(
     source_path: Path,
     dest_path: Path,
     predicate: Callable[[Path], bool] = lambda path: True,
 ) -> None:
-    with zipfile.ZipFile(dest_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        for path in source_path.rglob("*"):
+    with ReproducibleZipFile(dest_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for path in sorted(source_path.rglob("*")):
             if predicate(path):
                 zip_file.write(path, path.relative_to(source_path))
 
 
 def make_empty_zip(dest_path: Path) -> None:
-    with zipfile.ZipFile(dest_path, "w", zipfile.ZIP_DEFLATED):
+    with ReproducibleZipFile(dest_path, "w", zipfile.ZIP_DEFLATED):
         pass
 
 
