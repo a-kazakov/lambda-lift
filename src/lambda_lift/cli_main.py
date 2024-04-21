@@ -65,6 +65,8 @@ def cli_main(lambdas: list[str], deploy: list[str], deploy_all: list[str]) -> No
     except UserError as ex:
         rich_print(f"[red]{str(ex)}")
         sys.exit(2)
+    except click.ClickException:
+        raise
     except Exception:
         get_console().print_exception(show_locals=False)
         sys.exit(1)
