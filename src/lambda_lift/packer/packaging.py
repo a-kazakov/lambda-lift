@@ -25,8 +25,7 @@ def _get_pip_platform(platform: Platform) -> str:
 
 def _zip_predicate(path: Path) -> bool:
     return (
-        not any(p.endswith(".dist-info") for p in path.parts)
-        and not any(p.endswith(".pyc") for p in path.parts)
+        not any(p.endswith(".pyc") for p in path.parts)
         and "__pycache__" not in path.parts
     )
 
